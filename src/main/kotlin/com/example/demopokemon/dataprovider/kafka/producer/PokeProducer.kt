@@ -19,7 +19,7 @@ class PokeProducer(private val kafkaTemplate: KafkaTemplate<String, Any>) {
     private lateinit var pokemonTopic: String
 
     fun sendPokemon(pokemon: Any) {
-        LOGGER.info("sending message='{}' to topic='{}'", pokemon, pokemonTopic)
+        LOGGER.info("m=sendPokemon, i=sendPokemon='{}' to topic='{}'", pokemon, pokemonTopic)
         kafkaTemplate.send(pokemonTopic, pokemon)
     }
 
