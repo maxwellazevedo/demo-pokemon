@@ -22,6 +22,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven(url = "https://packages.confluent.io/maven/")
 }
 
 dependencies {
@@ -30,6 +31,9 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.kafka:spring-kafka")
+
+	implementation ("org.apache.avro:avro:1.10.2")
+	implementation ("io.confluent:kafka-avro-serializer:6.2.0")
 
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")

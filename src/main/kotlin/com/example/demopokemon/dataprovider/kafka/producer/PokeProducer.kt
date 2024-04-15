@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 
 @Slf4j
 @Component
-class PokeProducer(private val kafkaTemplate: KafkaTemplate<String, Any>) {
+class PokeProducer(@Autowired private val kafkaTemplate: KafkaTemplate<String, Any>) {
     private val LOGGER: Logger = LoggerFactory.getLogger(KafkaConsumer::class.java)
 
 

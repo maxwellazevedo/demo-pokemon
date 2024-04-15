@@ -22,6 +22,18 @@ services:
       KAFKA_CREATE_TOPIC: "simple.topic.kafka.test"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:6.2.0
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_DEBUG: "true"
+
   postgres:
     image: postgres:13
     ports:
