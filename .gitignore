@@ -39,3 +39,5 @@ out/
 ### Kotlin ###
 .kotlin
 /demo-pokemon.zip
+/src/main/kotlin/com/example/demopokemon/controller/testePokemonController.kt
+/src/main/kotlin/com/example/demopokemon/service/testePokeApiService.kt
