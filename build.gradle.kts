@@ -35,6 +35,10 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.kafka:spring-kafka-test")
+	testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+	testImplementation("org.testcontainers:kafka:1.19.3")
+	testImplementation("org.testcontainers:testcontainers:1.19.3")
+	testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
 }
 
 tasks.withType<KotlinCompile> {
