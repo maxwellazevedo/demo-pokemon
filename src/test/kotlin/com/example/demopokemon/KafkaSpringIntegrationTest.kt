@@ -13,6 +13,8 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.DockerImageName
+
 
 @SpringBootTest(classes = [DemoPokemonApplication::class])
 @Testcontainers
@@ -20,7 +22,7 @@ class KafkaSpringIntegrationTest {
 
     companion object {
         @Container
-        val kafka = KafkaContainer()
+        val kafka = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.2.1"))
 
         @JvmStatic
         @DynamicPropertySource /*pra injetar o bootstrapServers e o topic no Spring*/
