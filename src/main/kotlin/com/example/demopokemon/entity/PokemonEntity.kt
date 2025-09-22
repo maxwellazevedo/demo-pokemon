@@ -8,6 +8,7 @@ open class PokemonEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
+    @Column(unique = true)
     var name: String = "",
 
     @Column(columnDefinition = "TEXT")

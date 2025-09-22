@@ -1,21 +1,23 @@
-package com.example.demopokemon.integration
-
+import com.example.demopokemon.DemoPokemonApplication
 import com.example.demopokemon.entity.PokemonEntity
 import com.example.demopokemon.repository.PokemonRepository
 import com.example.demopokemon.service.PokeApiService
-import org.junit.jupiter.api.Assertions.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@ActiveProfiles("test")
-class PokeApiIntegrationTest(
+@SpringBootTest(
+    classes = [DemoPokemonApplication::class],
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)class PokeApiIntegrationTest(
     @Autowired private val pokeApiService: PokeApiService,
     @Autowired private val pokemonRepository: PokemonRepository,
     @Autowired private val restTemplate: TestRestTemplate
@@ -24,42 +26,51 @@ class PokeApiIntegrationTest(
     @LocalServerPort
     private var port: Int = 0
 
+    private val objectMapper = ObjectMapper()
+
+    @BeforeEach
+    fun setup() {
+        // Se tiver um repository para pokemon_abilities, limpe ele primeiro
+        //pokemonRepository.deleteAll()
+    }
+
     @Test
     fun `should fetch and save Pokemon from PokeAPI`() {
-        // Arrange
         val pokemonName = "pikachu"
-
-        // Act
         val pokemon = pokeApiService.fetchPokemon(pokemonName).block()
 
-        // Assert
-        assertNotNull(pokemon)
-        assertEquals(pokemonName, pokemon?.name)
+        Assertions.assertNotNull(pokemon)
+        Assertions.assertEquals(pokemonName, pokemon?.name)
 
         val savedPokemon = pokemonRepository.findByName(pokemonName)
-        assertNotNull(savedPokemon)
-        assertEquals(pokemonName, savedPokemon?.name)
+        Assertions.assertNotNull(savedPokemon)
+        Assertions.assertEquals(pokemonName, savedPokemon?.name)
+        // Opcional: validar se abilities e moves são JSON válidos
+        assertDoesNotThrow { objectMapper.readTree(savedPokemon?.abilities ?: "") }
+        assertDoesNotThrow { objectMapper.readTree(savedPokemon?.moves ?: "") }
     }
 
     @Test
     fun `should fetch Pokemon from database if already saved`() {
-        // Arrange
         val pokemonName = "pikachu"
+        val abilitiesList = listOf("static", "lightning-rod")
+        val movesList = listOf("thunder-shock", "quick-attack")
+        val abilitiesJson = objectMapper.writeValueAsString(abilitiesList)
+        val movesJson = objectMapper.writeValueAsString(movesList)
+
         val savedPokemon = pokemonRepository.save(
             PokemonEntity(
                 name = pokemonName,
-                abilities = mutableListOf("static", "lightning-rod"),
-                moves = mutableListOf("thunder-shock", "quick-attack")
+                abilities = abilitiesJson,
+                moves = movesJson
             )
         )
 
-        // Act
         val pokemon = pokeApiService.fetchPokemon(pokemonName).block()
 
-        // Assert
-        assertNotNull(pokemon)
-        assertEquals(savedPokemon.name, pokemon?.name)
-        assertEquals(savedPokemon.abilities, pokemon?.abilities)
-        assertEquals(savedPokemon.moves, pokemon?.moves)
+        Assertions.assertNotNull(pokemon)
+        Assertions.assertEquals(savedPokemon.name, pokemon?.name)
+        Assertions.assertEquals(savedPokemon.abilities, pokemon?.abilities)
+        Assertions.assertEquals(savedPokemon.moves, pokemon?.moves)
     }
 }
