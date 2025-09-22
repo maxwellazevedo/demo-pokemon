@@ -15,16 +15,23 @@ class PokeApiService(
     @Autowired private val webClientBuilder: WebClient.Builder,
     @Autowired private val pokemonRepository: PokemonRepository,
     @Autowired private val pokemonProducer: PokeProducer
-
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
     private val apiUrl = "https://pokeapi.co/api/v2/pokemon/"
+    private val objectMapper = ObjectMapper()
+
+    fun fetchAllPokemon(): Mono<List<PokemonEntity>> {
+        log.info("m=fetchAllPokemon, stage=init")
+        return Mono.just(pokemonRepository.findAll())
+            .doOnSuccess {
+                log.info("m=fetchAllPokemon, stage=finish, totalPokemon=${it.size}")
+            }
+    }
 
     fun fetchPokemon(pokemonName: String): Mono<PokemonEntity> {
         log.info("m=fetchPokemon, stage=init, pokemonName=$pokemonName")
 
-        // Verificar no banco de dados
         val cachedPokemon = pokemonRepository.findByName(pokemonName)
         log.info("m=fetchPokemon, stage=cached, pokemonName=$pokemonName, msg=cachedPokemonFound=${cachedPokemon != null}")
 
@@ -33,27 +40,24 @@ class PokeApiService(
             return Mono.just(cachedPokemon)
         }
 
-        // Buscar na PokeAPI
         return webClientBuilder.build()
             .get()
             .uri("$apiUrl$pokemonName")
             .retrieve()
             .bodyToMono(String::class.java)
             .map { responseBody ->
-                val objectMapper = ObjectMapper()
                 val jsonResponse = objectMapper.readTree(responseBody)
 
                 val name = jsonResponse["name"].asText()
-                val abilities = jsonResponse["abilities"]
-                    .map { it["ability"]["name"].asText() }
-                val moves = jsonResponse["moves"]
-                    .map { it["move"]["name"].asText() }
+                val abilitiesList = jsonResponse["abilities"].map { it["ability"]["name"].asText() }
+                val movesList = jsonResponse["moves"].map { it["move"]["name"].asText() }
 
-                val pokemonEntity = PokemonEntity(name = name, abilities = abilities.toMutableList(), moves = moves.toMutableList())
-                // Salvar no banco de dados
+                val abilitiesJson = objectMapper.writeValueAsString(abilitiesList)
+                val movesJson = objectMapper.writeValueAsString(movesList)
+
+                val pokemonEntity = PokemonEntity(name = name, abilities = abilitiesJson, moves = movesJson)
                 pokemonRepository.save(pokemonEntity)
                 pokemonProducer.sendPokemon(pokemonEntity)
-
                 pokemonEntity
             }
             .doOnSuccess {

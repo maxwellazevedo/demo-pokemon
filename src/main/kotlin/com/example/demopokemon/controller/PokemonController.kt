@@ -26,4 +26,9 @@ class PokemonController(@Autowired private val pokeApiService: PokeApiService) {
                 Mono.just(mapOf("error" to (ex.reason ?: "Unknown error") as Any))
             }
     }
+
+    @GetMapping("/all")
+    fun getAllPokemon(): Mono<List<PokemonEntity>> {
+        return pokeApiService.fetchAllPokemon()
+    }
 }

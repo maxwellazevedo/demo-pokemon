@@ -10,15 +10,11 @@ open class PokemonEntity(
 
     var name: String = "",
 
-    @ElementCollection
-    @CollectionTable(name = "pokemon_abilities", joinColumns = [JoinColumn(name = "pokemon_id")])
-    @Column(name = "ability")
-    var abilities: MutableList<String> = mutableListOf(),
+    @Column(columnDefinition = "TEXT")
+    var abilities: String = "", // Armazene como JSON ou CSV
 
-    @ElementCollection
-    @CollectionTable(name = "pokemon_moves", joinColumns = [JoinColumn(name = "pokemon_id")])
-    @Column(name = "move")
-    var moves: MutableList<String> = mutableListOf()
+    @Column(columnDefinition = "TEXT")
+    var moves: String = "" // Armazene como JSON ou CSV
 ) {
-    constructor() : this(null, "", mutableListOf(), mutableListOf())
+    constructor() : this(null, "", "", "")
 }
