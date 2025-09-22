@@ -23,10 +23,16 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
   postgres:
-    image: postgres:13
+    image: postgres:16
+    container_name: meu-postgres-local
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: demo_db
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: demo_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

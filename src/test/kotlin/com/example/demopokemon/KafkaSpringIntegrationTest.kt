@@ -40,6 +40,9 @@ class KafkaSpringIntegrationTest {
 
     @Test
     fun `deve enviar e receber mensagem com beans reais do projeto`() {
+        // Limpa o payload antes do teste
+        consumer.clearPayload()
+
         val expected = PokeResponseEntity(
             name = "pikachu",
             abilities = listOf("overgrow", "chlorophyll"),
@@ -48,12 +51,14 @@ class KafkaSpringIntegrationTest {
 
         producer.sendPokemon(expected)
 
-        // Esperar o consumidor processar a mensagem
-        await.atMost(5, TimeUnit.SECONDS).until {
-            consumer.getPayload() != null
+        // Espera até que o consumidor processe a mensagem
+        await.atMost(10, TimeUnit.SECONDS).until {
+            consumer.getPayload()?.name == expected.name
         }
 
         val received = consumer.getPayload()
         assertEquals(expected.name, received?.name)
+        assertEquals(expected.abilities, received?.abilities)
+        assertEquals(expected.moves, received?.moves)
     }
 }
