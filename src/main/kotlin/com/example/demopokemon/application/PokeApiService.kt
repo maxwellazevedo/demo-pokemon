@@ -1,6 +1,7 @@
 package com.example.demopokemon.application
 
 import com.example.demopokemon.adapter.messaging.PokeProducer
+import com.example.demopokemon.domain.exception.PokemonNotFoundException
 import com.example.demopokemon.domain.model.Pokemon
 import com.example.demopokemon.domain.port.PokemonRepositoryPort
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 
@@ -60,6 +62,13 @@ class PokeApiService(
             .uri("$pokeApiBaseUrl$pokemonName")
             .retrieve()
             .bodyToMono(String::class.java)
+            .onErrorMap(WebClientResponseException::class.java) { ex ->
+                if (ex.statusCode.value() == 404) {
+                    PokemonNotFoundException(pokemonName)
+                } else {
+                    ex
+                }
+            }
             .map { body ->
                 val json = objectMapper.readTree(body)
                 val name = json["name"].asText()
