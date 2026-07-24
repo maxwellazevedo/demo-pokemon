@@ -1,8 +1,7 @@
-package com.example.demopokemon.controller
+package com.example.demopokemon.adapter.web
 
-import com.example.demopokemon.entity.PokemonEntity
-import com.example.demopokemon.service.PokeApiService
-import org.springframework.beans.factory.annotation.Autowired
+import com.example.demopokemon.application.PokeApiService
+import com.example.demopokemon.domain.model.Pokemon
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -11,24 +10,25 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
 
-@RequestMapping("/pokemon")
+/**
+ * Adaptador de entrada HTTP — expõe os casos de uso via REST.
+ */
 @RestController
-class PokemonController(@Autowired private val pokeApiService: PokeApiService) {
+@RequestMapping("/pokemon")
+class PokemonController(private val pokeApiService: PokeApiService) {
 
     @GetMapping("/{name}")
-    fun getPokemon(@PathVariable name: String): Mono<Map<String, Any>> {
-        return pokeApiService.fetchPokemon(name)//TODO: Modifique o método fetchPokemon para verificar o banco antes de consultar a PokeAPI
-            .map { pokemon: PokemonEntity -> mapOf("data" to pokemon as Any) }
+    fun getPokemon(@PathVariable name: String): Mono<Map<String, Any>> =
+        pokeApiService.fetchPokemon(name)
+            .map { pokemon: Pokemon -> mapOf("data" to pokemon as Any) }
             .switchIfEmpty(
                 Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND, "Pokemon not found"))
             )
             .onErrorResume(ResponseStatusException::class.java) { ex ->
                 Mono.just(mapOf("error" to (ex.reason ?: "Unknown error") as Any))
             }
-    }
 
     @GetMapping("/all")
-    fun getAllPokemon(): Mono<List<PokemonEntity>> {
-        return pokeApiService.fetchAllPokemon()
-    }
+    fun getAllPokemon(): Mono<List<Pokemon>> =
+        pokeApiService.fetchAllPokemon()
 }

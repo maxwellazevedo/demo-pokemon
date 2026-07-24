@@ -2,8 +2,11 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: demo-pokemon
+
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -12,20 +15,24 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "*"
+        # Restringe desserialização apenas ao pacote de domínio — evita execução arbitrária de classes
+        spring.json.trusted.packages: "com.example.demopokemon.domain.model"
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/demo_db
-    username: admin
-    password: password
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/demo_db}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update        # cria/atualiza as tabelas automaticamente
+      ddl-auto: update   # cria a tabela se não existir; para banco com schema antigo, execute db/migration-jsonb.sql antes
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
 topic: simple.topic.kafka.fetch-pokemon
+
+pokeapi:
+  base-url: ${POKEAPI_BASE_URL:https://pokeapi.co/api/v2/pokemon/}

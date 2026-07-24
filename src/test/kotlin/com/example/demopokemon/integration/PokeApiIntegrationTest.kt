@@ -1,76 +1,67 @@
+package com.example.demopokemon.integration
+
 import com.example.demopokemon.DemoPokemonApplication
-import com.example.demopokemon.entity.PokemonEntity
-import com.example.demopokemon.repository.PokemonRepository
-import com.example.demopokemon.service.PokeApiService
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.jupiter.api.Assertions
+import com.example.demopokemon.adapter.messaging.PokeProducer
+import com.example.demopokemon.application.PokeApiService
+import com.example.demopokemon.domain.model.Pokemon
+import com.example.demopokemon.domain.port.PokemonRepositoryPort
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest(
-    classes = [DemoPokemonApplication::class],
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)class PokeApiIntegrationTest(
-    @Autowired private val pokeApiService: PokeApiService,
-    @Autowired private val pokemonRepository: PokemonRepository,
-    @Autowired private val restTemplate: TestRestTemplate
+/**
+ * Teste de integração do PokeApiService com banco H2.
+ * O PokeProducer é mockado para evitar dependência do Kafka neste contexto.
+ */
+@SpringBootTest(classes = [DemoPokemonApplication::class])
+@ActiveProfiles("test")
+class PokeApiIntegrationTest @Autowired constructor(
+    private val pokeApiService: PokeApiService,
+    private val pokemonRepository: PokemonRepositoryPort
 ) {
-
-    @LocalServerPort
-    private var port: Int = 0
-
-    private val objectMapper = ObjectMapper()
+    @MockBean
+    private lateinit var pokeProducer: PokeProducer
 
     @BeforeEach
     fun setup() {
-        // Se tiver um repository para pokemon_abilities, limpe ele primeiro
-        //pokemonRepository.deleteAll()
+        doNothing().whenever(pokeProducer).sendPokemon(any())
     }
 
     @Test
-    fun `should fetch and save Pokemon from PokeAPI`() {
-        val pokemonName = "pikachu"
-        val pokemon = pokeApiService.fetchPokemon(pokemonName).block()
-
-        Assertions.assertNotNull(pokemon)
-        Assertions.assertEquals(pokemonName, pokemon?.name)
-
-        val savedPokemon = pokemonRepository.findByName(pokemonName)
-        Assertions.assertNotNull(savedPokemon)
-        Assertions.assertEquals(pokemonName, savedPokemon?.name)
-        // Opcional: validar se abilities e moves são JSON válidos
-        assertDoesNotThrow { objectMapper.readTree(savedPokemon?.abilities ?: "") }
-        assertDoesNotThrow { objectMapper.readTree(savedPokemon?.moves ?: "") }
-    }
-
-    @Test
-    fun `should fetch Pokemon from database if already saved`() {
-        val pokemonName = "pikachu"
-        val abilitiesList = listOf("static", "lightning-rod")
-        val movesList = listOf("thunder-shock", "quick-attack")
-        val abilitiesJson = objectMapper.writeValueAsString(abilitiesList)
-        val movesJson = objectMapper.writeValueAsString(movesList)
-
-        val savedPokemon = pokemonRepository.save(
-            PokemonEntity(
-                name = pokemonName,
-                abilities = abilitiesJson,
-                moves = movesJson
+    fun `fetchPokemon retorna pokemon do cache quando ja salvo`() {
+        val saved = pokemonRepository.save(
+            Pokemon(
+                name = "pikachu",
+                abilities = listOf("static", "lightning-rod"),
+                moves = listOf("thunder-shock", "quick-attack")
             )
         )
 
-        val pokemon = pokeApiService.fetchPokemon(pokemonName).block()
+        val result = pokeApiService.fetchPokemon("pikachu").block()
 
-        Assertions.assertNotNull(pokemon)
-        Assertions.assertEquals(savedPokemon.name, pokemon?.name)
-        Assertions.assertEquals(savedPokemon.abilities, pokemon?.abilities)
-        Assertions.assertEquals(savedPokemon.moves, pokemon?.moves)
+        assertNotNull(result)
+        assertEquals(saved.name, result?.name)
+        assertEquals(saved.abilities, result?.abilities)
+        assertEquals(saved.moves, result?.moves)
+    }
+
+    @Test
+    fun `fetchAllPokemon retorna todos os pokemon salvos`() {
+        pokemonRepository.save(Pokemon(name = "bulbasaur", abilities = listOf("overgrow"), moves = listOf("tackle")))
+        pokemonRepository.save(Pokemon(name = "charmander", abilities = listOf("blaze"), moves = listOf("scratch")))
+
+        val result = pokeApiService.fetchAllPokemon().block()
+
+        assertNotNull(result)
+        assertTrue(result!!.size >= 2)
+        assertTrue(result.any { it.name == "bulbasaur" })
+        assertTrue(result.any { it.name == "charmander" })
     }
 }
