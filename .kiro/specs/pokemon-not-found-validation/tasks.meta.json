@@ -1,0 +1,104 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Criar a exceção de domínio `PokemonNotFoundException`": [
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902424405
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902430468
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902737120
+      }
+    ],
+    "2.1 Modificar `fetchFromApi` em `PokeApiService.kt` para usar `onErrorMap`": [
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902424448
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902740191
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902817004
+      }
+    ],
+    "3. Checkpoint — verificar testes do `PokeApiService`": [
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902424506
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902827367
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784903047410
+      }
+    ],
+    "4.1 Modificar o endpoint `getPokemon` em `PokemonController.kt`": [
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902424539
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784903050484
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784903125073
+      }
+    ],
+    "5. Checkpoint final — garantir que todos os testes passam": [
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902424572
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784903128285
+      },
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784903519895
+      }
+    ],
+    "2. Adicionar tratamento de 404 no `PokeApiService`": [
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784902817039
+      }
+    ],
+    "4. Atualizar `PokemonController` para retornar `ResponseEntity` tipado": [
+      {
+        "executionId": "8ea5017d-4bc7-428e-b7e9-d9700b71931a",
+        "chatSessionId": "sess_7ac401d6-5b5c-4720-9b56-710443032164",
+        "timestamp": 1784903125122
+      }
+    ]
+  }
+}
